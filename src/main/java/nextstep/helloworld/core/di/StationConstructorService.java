@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class StationConstructorService {
 
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationConstructorService(final StationRepository stationRepository) {
         this.stationRepository = stationRepository;
