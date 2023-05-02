@@ -2,9 +2,13 @@ package nextstep.helloworld.auth.ui;
 
 import nextstep.helloworld.auth.application.AuthService;
 import nextstep.helloworld.auth.application.AuthorizationException;
+import nextstep.helloworld.auth.dto.AuthInfo;
 import nextstep.helloworld.auth.dto.MemberResponse;
 import nextstep.helloworld.auth.dto.TokenRequest;
 import nextstep.helloworld.auth.dto.TokenResponse;
+import nextstep.helloworld.auth.infrastructure.AuthorizationExtractor;
+import nextstep.helloworld.auth.infrastructure.BasicAuthorizationExtractor;
+import nextstep.helloworld.auth.infrastructure.BearerAuthorizationExtractor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class AuthController {
     private static final String SESSION_KEY = "USER";
+
+    private AuthorizationExtractor<AuthInfo> basicAuthorizationExtractor = new BasicAuthorizationExtractor();
     private AuthService authService;
 
 
@@ -89,10 +95,9 @@ public class AuthController {
      * accept: application/json
      */
     @GetMapping("/members/you")
-    public ResponseEntity findYourInfo(HttpServletRequest request) {
-        // TODO: authorization 헤더의 Bearer 값을 추출하기
-        String token = "";
-        MemberResponse member = authService.findMemberByToken(token);
+    public ResponseEntity findYourInfo(final HttpServletRequest request) {
+        final String token = "";
+        final MemberResponse member = authService.findMemberByToken(token);
         return ResponseEntity.ok().body(member);
     }
 
@@ -100,14 +105,21 @@ public class AuthController {
      * ex) request sample
      * <p>
      * GET /members/my HTTP/1.1
-     * authorization: Basic ZW1haWxAZW1haWwuY29tOjEyMzQ=
+     * authorization: Basic ZW1haWxAZW1haWwuY29tOjEyMzQ= // basic header
      * accept: application/json
      */
     @GetMapping("/members/my")
-    public ResponseEntity findMyInfo(HttpServletRequest request) {
-        // TODO: authorization 헤더의 Basic 값을 추출하기
-        String email = "";
-        MemberResponse member = authService.findMember(email);
+    public ResponseEntity<MemberResponse> findMyInfo(final HttpServletRequest request) {
+        final AuthInfo authInfo = basicAuthorizationExtractor.extract(request);
+
+        final String email = authInfo.getEmail();
+        final String password = authInfo.getPassword();
+
+        if (authService.checkInvalidLogin(email, password)) {
+            throw new AuthorizationException("인증에 실패하였습니다");
+        }
+
+        final MemberResponse member = authService.findMember(email);
         return ResponseEntity.ok().body(member);
     }
 }

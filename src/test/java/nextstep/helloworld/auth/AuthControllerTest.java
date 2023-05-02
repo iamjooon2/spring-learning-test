@@ -31,7 +31,7 @@ class AuthControllerTest {
 
     @Test
     void sessionLogin() {
-        MemberResponse member = RestAssured
+        final MemberResponse member = RestAssured
                 .given().log().all()
                 .auth().form(EMAIL, PASSWORD, new FormAuthConfig("/login/session", USERNAME_FIELD, PASSWORD_FIELD))
                 .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -44,7 +44,7 @@ class AuthControllerTest {
 
     @Test
     void tokenLogin() {
-        String accessToken = RestAssured
+        final String accessToken = RestAssured
                 .given().log().all()
                 .body(new TokenRequest(EMAIL, PASSWORD))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -52,7 +52,7 @@ class AuthControllerTest {
                 .when().post("/login/token")
                 .then().log().all().extract().as(TokenResponse.class).getAccessToken();
 
-        MemberResponse member = RestAssured
+        final MemberResponse member = RestAssured
                 .given().log().all()
                 .auth().oauth2(accessToken)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -65,7 +65,7 @@ class AuthControllerTest {
 
     @Test
     void basicLogin() {
-        MemberResponse member = RestAssured
+        final MemberResponse member = RestAssured
                 .given().log().all()
                 .auth().preemptive().basic(EMAIL, PASSWORD)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
