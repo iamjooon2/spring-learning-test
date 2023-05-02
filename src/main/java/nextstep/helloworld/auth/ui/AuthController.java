@@ -34,10 +34,10 @@ public class AuthController {
     }
 
     @PostMapping("/login/session")
-    public ResponseEntity sessionLogin(HttpServletRequest request, HttpSession session) {
-        Map<String, String[]> paramMap = request.getParameterMap();
-        String email = paramMap.get(USERNAME_FIELD)[0];
-        String password = paramMap.get(PASSWORD_FIELD)[0];
+    public ResponseEntity sessionLogin(final HttpServletRequest request,final HttpSession session) {
+        final Map<String, String[]> paramMap = request.getParameterMap();
+        final String email = paramMap.get(USERNAME_FIELD)[0];
+        final String password = paramMap.get(PASSWORD_FIELD)[0];
 
         if (authService.checkInvalidLogin(email, password)) {
             throw new AuthorizationException();

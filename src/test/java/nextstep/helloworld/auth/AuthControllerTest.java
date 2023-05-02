@@ -67,7 +67,7 @@ class AuthControllerTest {
     void basicLogin() {
         MemberResponse member = RestAssured
                 .given().log().all()
-                .auth().preemptive().basic(EMAIL, PASSWORD)
+                .auth().preemptive().basic(EMAIL, PASSWORD) // preemitive() 초기 인증 방식을 생략하기 위해 사용
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/members/my")
                 .then().log().all()
